@@ -6,10 +6,10 @@
 #define TOURNAMENT_CTR_MAX 3
 #define PHT_CTR_INIT 2
 
-#define HIST_LEN   8
-#define TOUR_LEN   8
-#define BHT_BIT_SIZE 4
-#define BHT_HIST_LENGTH 8
+#define HIST_LEN   16
+#define TOUR_LEN   16
+#define BHT_BIT_SIZE 11
+#define BHT_HIST_LENGTH 16
 #define PHT_LOCAL_CTR_INIT 2
 #define PHT_LOCAL_CTR_MAX  3
 #define UINT16      unsigned short int
