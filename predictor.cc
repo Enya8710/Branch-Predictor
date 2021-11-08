@@ -13,26 +13,12 @@
 // Total perceptron table size = 512*8*123= 503,808 bits
 // Total perceptron steps table size = 512 * 8 = 4,096 bits
 // Total Size = perceptron table size + history register size + perceptron steps table = 503,808 + 4,096 + 122 = 508,026 bits
-//Reference
-// Total storage budget: 32KB
-// Total bits in history register:  59 bits
-// Total number of weights per perceptron:  59 + 1 = 60
-// Total bits to store weight: 8
-// Total number of perceptrons: 512
-// Threshold = 1.93*h + 14 = 1.93*59 + 14 = 127.87 ~ 128
-// Total perceptron table size = 512 * 60 * 8 = 245760 bits
-// Total perceptron steps table size = 512 * 8 = 4096 bits
-// Total Size = perceptron table size + history register size
-//       + perceptron steps table = 245760 + 4096 + 59 = 249915 bits
 /////////////////////////////////////////////////////////////
-//My version
 UINT32 divide(bitset<122> n,int m){
     // calculate Remainder by
     // n AND (m-1)
     bitset<122> bs(m-1);
     UINT32 res = ((n)&(bs)).to_ulong();
-    // calculate quotient by
-    // right shifting n by (log2(m)) times
     return res;
 }
 UINT32 PREDICTOR::HashPC(UINT32 PC){
