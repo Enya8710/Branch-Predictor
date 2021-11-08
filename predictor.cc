@@ -42,25 +42,25 @@ bool   PREDICTOR::GetPrediction(UINT32 PC){
   INT32 p = 0;
   p += table[index][0];
   for(UINT32 i=1; i < 123; i++){
-    if(ghr[i - 1] == 1){            //if taken
-	    p += table[index][i];          // add weight
+    if(ghr[i - 1] == 1){            
+	    p += table[index][i];          
     }
     else{
-	    p -= table[index][i];          // subtract weight
+      p -= table[index][i];         
     }
   }
   s = abs(p);
   if(p >= 0){
-    return TAKEN;                 //greater than zero predtict taken
+    return TAKEN;                
   }
   else{
-    return NOT_TAKEN;           //less than zero predict not taken
+    return NOT_TAKEN;           
   }
 }
 
 void  PREDICTOR::UpdatePredictor(UINT32 PC, bool resolveDir, bool predDir, UINT32 branchTarget){
   UINT32 index = HashPC(PC);
-  if(resolveDir != predDir || s <= 249){ //update if less than Threshold
+  if(resolveDir != predDir || s <= 249){ 
     if(resolveDir == TAKEN){
 	    int32_t updateVal = table[index][0] + 1;
 	    if (updateVal > 250){

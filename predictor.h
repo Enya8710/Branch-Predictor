@@ -13,7 +13,8 @@ class PREDICTOR{
   UINT32 table[512][123];
  public:
   PREDICTOR(void);
-  UINT32 HashPC(UINT32 PC);
+  UINT32  divide(bitset<122> n,int m);
+  UINT32  HashPC(UINT32 PC);
   bool    GetPrediction(UINT32 PC);
   void    UpdatePredictor(UINT32 PC, bool resolveDir, bool predDir, UINT32 branchTarget);
   void    TrackOtherInst(UINT32 PC, OpType opType, UINT32 branchTarget);
