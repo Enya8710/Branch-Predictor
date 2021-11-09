@@ -14,11 +14,11 @@
 // Total perceptron steps table size = 512 * 8 = 4,096 bits
 // Total Size = perceptron table size + history register size + perceptron steps table = 503,808 + 4,096 + 122 = 508,026 bits
 /////////////////////////////////////////////////////////////
-UINT32 divide(bitset<122> n,int m){
+UINT32 PREDICTOR::divide(bitset<122> n,int m){
     // calculate Remainder by
     // n AND (m-1)
     bitset<122> bs(m-1);
-    UINT32 res = ((n)&(bs)).to_ulong();
+    UINT32 res = ((n)&(bs)).to_ullong();
     return res;
 }
 UINT32 PREDICTOR::HashPC(UINT32 PC){
@@ -28,85 +28,126 @@ UINT32 PREDICTOR::HashPC(UINT32 PC){
 }
 
 PREDICTOR::PREDICTOR(void){
-  s = 0;
-  ghr = bitset<122>();
-  for(UINT32 i=0; i < 512; i++){
-    for(UINT32 j=0; j < 122; j++){
-	    table[i][j] = 0;                
-    }
-  }
+	s = 0;
+  	ghr = bitset<122>();
+  	for(UINT32 i=0; i < 512; i++){
+    	for(UINT32 j=0; j < 122; j++){
+	    	table[i][j] = 0;                
+    	}
+  	}
 }
 
 bool   PREDICTOR::GetPrediction(UINT32 PC){
-  UINT32 index = HashPC(PC);
-  INT32 p = 0;
-  p += table[index][0];
-  for(UINT32 i=1; i < 123; i++){
-    if(ghr[i - 1] == 1){            
-	    p += table[index][i];          
-    }
-    else{
-      p -= table[index][i];         
-    }
-  }
-  s = abs(p);
-  if(p >= 0){
-    return TAKEN;                
-  }
-  else{
-    return NOT_TAKEN;           
-  }
+  	UINT32 index = HashPC(PC);
+  	INT32 p = 0;
+  	p = p + table[index][0];
+  	for(UINT32 i=1; i < 123; i++){
+    	if(ghr[i - 1] == 1){            
+	    	p = p + table[index][i];          
+    	}
+    	else{
+      		p = p - table[index][i];         
+    	}
+  	}
+  	s = abs(p);
+  	if(p > 0){
+    	return TAKEN;                
+  	}
+  	else{
+    	return NOT_TAKEN;           
+  	}
 }
 
 void  PREDICTOR::UpdatePredictor(UINT32 PC, bool resolveDir, bool predDir, UINT32 branchTarget){
-  UINT32 index = HashPC(PC);
-  if(resolveDir != predDir || s <= 249){ 
-    if(resolveDir == TAKEN){
-	    int32_t updateVal = table[index][0] + 1;
-	    if (updateVal > 250){
-		    table[index][0] = 250;
-	    }
-	    else{
-		    table[index][0]++;
-	    }
-	  }
-    else{
-	    int32_t updateVal = table[index][0] - 1;
-	    if (updateVal < -250){
-		    table[index][0] = -250;
-	    }
-	    else{
-		    table[index][0]--;
-	    }
-	  }
-	  for(UINT32 i = 1; i < 123; i++){
-      if((resolveDir == TAKEN && ghr[i - 1] == 1) || (resolveDir == NOT_TAKEN && ghr[i - 1] == 0)){
-		    int32_t updateVal = table[index][i] + 1;
-	      if (updateVal > 249){
-		      table[index][i] = 249;
-	      }
-	      else{
-			    table[index][i]++;
-		    }
-      }
-	    else{
-	      int32_t updateVal = table[index][i] - 1;
-	      if (updateVal < -249){
-		      table[index][i] = -249;
-	      }
-		    else{
-			    table[index][i]--;
-		    }
-	    }
-	  }
-  }
-  ghr = (ghr << 1);
-  if(resolveDir == TAKEN){
-    ghr.set(0, 1);
-  }
-  else{
-	  ghr.set(0, 0);
-  }
+  	UINT32 index = HashPC(PC);
+//   if(resolveDir != predDir || s <= 300){ 
+//     if(resolveDir == TAKEN){
+// 	    int32_t updateVal = table[index][0] + 1;
+// 	    if (updateVal > 301){
+// 		    table[index][0] = 301;
+// 	    }
+// 	    else{
+// 		    table[index][0]++;
+// 	    }
+// 	  }
+//     else{
+// 	    int32_t updateVal = table[index][0] - 1;
+// 	    if (updateVal < -300){
+// 		    table[index][0] = -300;
+// 	    }
+// 	    else{
+// 		    table[index][0]--;
+// 	    }
+// 	  }
+// 	  for(UINT32 i = 1; i < 300; i++){
+//       if((resolveDir == TAKEN && ghr[i - 1] == 1) || (resolveDir == NOT_TAKEN && ghr[i - 1] == 0)){
+// 		    int32_t updateVal = table[index][i] + 1;
+// 	      if (updateVal > 300){
+// 		      table[index][i] = 300;
+// 	      }
+// 	      else{
+// 			    table[index][i]++;
+// 		    }
+//       }
+// 	    else{
+// 	      int32_t updateVal = table[index][i] - 1;
+// 	      if (updateVal < -300){
+// 		      table[index][i] = -300;
+// 	      }
+// 		    else{
+// 			    table[index][i]--;
+// 		    }
+// 	    }
+// 	  }
+//   }
+  	//Origin
+	if(resolveDir != predDir || s < 249){ 
+    	if(resolveDir == TAKEN){
+	    	int32_t updateVal = table[index][0]+1;
+	    	if (updateVal > 250){
+		    	table[index][0] = 250;
+	    	}
+	    	else{
+		    	table[index][0] = table[index][0]+1;
+	    	}
+	  	}
+    	else{
+	    	int32_t updateVal = table[index][0]-1;
+	    	if (updateVal < -250){
+		    	table[index][0] = -250;
+	    	}
+	    	else{
+		    	table[index][0] = table[index][0]-1;
+	    	}
+	  	}
+		for(UINT32 i = 1; i < 123; i++){
+      		if((resolveDir == TAKEN && ghr[i - 1] == 1) || (resolveDir == NOT_TAKEN && ghr[i - 1] == 0)){
+				int32_t updateVal = table[index][i] + 1;
+	    		if (updateVal > 249){
+		    		table[index][i] = 249;
+	      		}
+	      		else{
+					table[index][i] = table[index][i]+1;
+		    	}
+      		}
+	    	else{
+	    		int32_t updateVal = table[index][i] - 1;
+	    		if (updateVal < -249){
+		    		table[index][i] = -249;
+	      		}
+		    	else{
+			    	table[index][i] = table[index][i]-1;
+		    	}
+	    	}
+		}
+  	}
+	ghr = (ghr << 1);
+  	if(resolveDir == TAKEN){
+    	ghr.set(0, 1);
+  	}
+  	else{
+		ghr.set(0, 0);
+  	}
 }
 
 void    PREDICTOR::TrackOtherInst(UINT32 PC, OpType opType, UINT32 branchTarget){
