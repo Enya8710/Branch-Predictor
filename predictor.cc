@@ -46,38 +46,32 @@ PREDICTOR::PREDICTOR(void){
 
 bool   PREDICTOR::GetPrediction(UINT32 PC){
 	// hash the history address to get perceptron index
-  	index[0] = HashPC(PC);
+  	UINT32 index = HashPC(PC);
 	// initialize the predict
   	INT32 predict = 0;
 	// calculate predict based on the perceptron table and global history
 	// add the bias
-  	predict = predict + table[index[0]][0];
+  	predict = predict + table[index][0];
   	for(UINT32 i=1; i < 123; i++){
     	if(i <= 31){
-			index[i] = HashPC(lhr[i-1]^PC);
-	  		predict = predict + table[index[i]][i]; 
-			// //if history is taken
-			// if(lhr[i - 1] == 1){
-			// 	// add the weight
-			// 	index[i] = HashPC(lhr[i-1]^PC) 
-	  		// 	predict = predict + table[index[i]][i];   
-    		// }
-			// //if history is not taken
-    		// else{
-			// 	//substract the weight
-			// 	index[i] = HashPC(lhr[i-1]^PC) 
-	  		// 	predict = predict - table[index[i]][i]; 
-    		// }
+			//if history is taken
+			if(lhr[i - 1] == 1){
+				// add the weight
+	  			predict = predict + table[index][i];   
+    		}
+			//if history is not taken
+    		else{
+				//substract the weight
+	  			predict = predict - table[index][i]; 
+    		}
 		}
 		else{
-			index[i] = HashPC(ghr[i-1]^PC);
-	  		predict = predict + table[index[i]][i]; 
-			// if(ghr[i - 1] == 1){
-	  		// 	predict = predict + table[index][i];   
-    		// }
-    		// else{
-	  		// 	predict = predict - table[index][i]; 
-    		// }
+			if(ghr[i - 1] == 1){
+	  			predict = predict + table[index][i];   
+    		}
+    		else{
+	  			predict = predict - table[index][i]; 
+    		}
 		}
   	}
 	//update the perceptron based on the absolute value of predict
@@ -93,50 +87,50 @@ bool   PREDICTOR::GetPrediction(UINT32 PC){
 }
 
 void  PREDICTOR::UpdatePredictor(UINT32 PC, bool resolveDir, bool predDir, UINT32 branchTarget){
-  	index[0] = HashPC(PC);
+  	UINT32 index = HashPC(PC);
   	//Update the prediction table, if threshold is not reached or the predicted outcome is different from true result
 	//Update the bias first and then update the weights.
 	if(resolveDir != predDir || sum <= 249){ 
 		//If branch is taken, it will increment the bias value.
     	if(resolveDir == TAKEN){
-	    	int32_t updateVal = table[index[0]][0]+1;
+	    	int32_t updateVal = table[index][0]+1;
 	    	if (updateVal > 250){
-		    	table[index[0]][0] = 250;
+		    	table[index][0] = 250;
 	    	}
 	    	else{
-		    	table[index[0]][0] = table[index[0]][0]+1;
+		    	table[index][0] = table[index][0]+1;
 	    	}
 	  	}
 		//If the branch is not taken, it will decrement the bias value.
     	else{
-	    	int32_t updateVal = table[index[0]][0]-1;
+	    	int32_t updateVal = table[index][0]-1;
 	    	if (updateVal < -250){
-		    	table[index[0]][0] = -250;
+		    	table[index][0] = -250;
 	    	}
 	    	else{
-		    	table[index[0]][0] = table[index[0]][0]-1;
+		    	table[index][0] = table[index][0]-1;
 	    	}
 	  	}
 		// update the weight
 		for(UINT32 i = 1; i < 123; i++){
 			//If the branch result matches the true result, it will increment the weight
       		if((resolveDir == TAKEN && ghr[i - 1] == 1) || (resolveDir == NOT_TAKEN && ghr[i - 1] == 0)){
-				int32_t updateVal = table[index[i]][i] + 1;
+				int32_t updateVal = table[index][i] + 1;
 	    		if (updateVal > 249){
-		    		table[index[i]][i] = 249;
+		    		table[index][i] = 249;
 	      		}
 	      		else{
-					table[index[i]][i] = table[index[i]][i]+1;
+					table[index][i] = table[index][i]+1;
 		    	}
       		}
 			//If the branch result does not match the true result, it will decrement the weight
 	    	else{
-	    		int32_t updateVal = table[index[i]][i] - 1;
+	    		int32_t updateVal = table[index][i] - 1;
 	    		if (updateVal < -249){
-		    		table[index[i]][i] = -249;
+		    		table[index][i] = -249;
 	      		}
 		    	else{
-			    	table[index[i]][i] = table[index[i]][i]-1;
+			    	table[index][i] = table[index][i]-1;
 		    	}
 	    	}
 		}

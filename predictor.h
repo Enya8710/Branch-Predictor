@@ -11,7 +11,6 @@ class PREDICTOR{
   bitset<31> lhr;
   bitset<122> ghr;
   UINT32 sum;
-  UINT32 index[123];
   UINT32 table[512][123];
  public:
   PREDICTOR(void);
