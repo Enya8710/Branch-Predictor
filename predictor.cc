@@ -59,17 +59,22 @@ PREDICTOR::PREDICTOR(void){
 bool   PREDICTOR::GetPrediction(UINT32 PC){
 	//new
 	index[0] = PC%512;
+	//initialize the predict
 	INT32 predict = 0;
+	// calculate predict based on the perceptron table and global history
+	// calculate the bias
 	predict = table[index[0]][0];
 	for(UINT32 i=1; i < 123; i++){
     	if(i<=71){
-			// index[i] = HashPCl(PC);
+			// hash the local history register
 			index[i] = (lhr[i-1]^PC)%512;
+			// add the weight
 			predict = predict+table[index[i]][i];
 		}
 		else{
-			// index[i] = HashPC(PC);
+			// hash the global history register
 			index[i] = (ghr[i-71]^PC)%512;
+			// add the weight
 			predict = predict+table[index[i]][i];
 		}
   	}
